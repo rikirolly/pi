@@ -18,11 +18,13 @@ export interface AddMemoryOptions {
 	custom_instructions?: string;
 }
 
-export interface AddMemoryResponse {
+export interface AddMemoryResponseItem {
 	message: string;
 	status: "PENDING" | "SUCCEEDED" | "FAILED";
 	event_id: string;
 }
+
+export type AddMemoryResponse = AddMemoryResponseItem[];
 
 export interface Memory {
 	id: string;

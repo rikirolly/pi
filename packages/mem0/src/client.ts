@@ -30,7 +30,7 @@ export type {
 	UpdateMemoryOptions,
 } from "./types.js";
 
-const DEFAULT_BASE_URL = "https://api.mem0.ai/v3";
+const DEFAULT_BASE_URL = "https://api.mem0.ai/v1";
 
 /**
  * Mem0 API client for managing persistent memories
@@ -48,21 +48,40 @@ export class Mem0Client {
 	 * Add memories from conversation messages
 	 */
 	async addMemories(options: AddMemoryOptions): Promise<AddMemoryResponse> {
-		return this.request<AddMemoryResponse>("POST", "/memories/add/", options);
+		// v1 API requires user_id - use default if not provided
+		const payload = {
+			...options,
+			user_id: options.user_id ?? "default",
+		};
+		return this.request<AddMemoryResponse>("POST", "/memories/", payload);
 	}
 
 	/**
 	 * Search memories with semantic and keyword matching
 	 */
 	async searchMemories(options: SearchMemoryOptions): Promise<SearchMemoryResponse> {
-		return this.request<SearchMemoryResponse>("POST", "/memories/search/", options);
+		// v1 API requires user_id in filters
+		const payload = {
+			query: options.query,
+			user_id: options.filters?.user_id ?? "default",
+			top_k: options.top_k,
+		};
+		return this.request<SearchMemoryResponse>("POST", "/memories/search/", payload);
 	}
 
 	/**
 	 * Get all memories for an entity
 	 */
 	async getMemories(options: GetMemoriesOptions): Promise<GetMemoriesResponse> {
-		return this.request<GetMemoriesResponse>("POST", "/memories/", options);
+		// v1 API uses GET with query params
+		const params = new URLSearchParams();
+		params.set("user_id", options.user_id ?? "default");
+		if (options.agent_id) params.set("agent_id", options.agent_id);
+		if (options.run_id) params.set("run_id", options.run_id);
+		if (options.app_id) params.set("app_id", options.app_id);
+		
+		const memories = await this.request<Memory[]>("GET", `/memories/?${params.toString()}`);
+		return { results: memories };
 	}
 
 	/**
@@ -120,7 +139,8 @@ export class Mem0Client {
 	 */
 	async addMemoriesAndWait(options: AddMemoryOptions, timeout?: number): Promise<Memory[]> {
 		const response = await this.addMemories(options);
-		const event = await this.waitForEvent(response.event_id, { timeout });
+		const first = response[0];
+		const event = await this.waitForEvent(first.event_id, { timeout });
 		
 		if (event.status === "FAILED") {
 			throw new Error(`Memory addition failed: ${JSON.stringify(event.data)}`);

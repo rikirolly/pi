@@ -49,7 +49,9 @@ function createDefaultOperations(client: Mem0Client, options: { userId?: string;
 				run_id: options.runId,
 				metadata,
 			});
-			return { event_id: result.event_id, status: result.status };
+			// API returns an array - get first item
+			const first = result[0];
+			return { event_id: first.event_id, status: first.status };
 		},
 	};
 }
