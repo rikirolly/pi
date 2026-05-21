@@ -66,7 +66,9 @@ export class Mem0Client {
 			user_id: options.filters?.user_id ?? "default",
 			top_k: options.top_k,
 		};
-		return this.request<SearchMemoryResponse>("POST", "/memories/search/", payload);
+		// API returns array directly, wrap it in { results: [...] }
+		const memories = await this.request<Memory[]>("POST", "/memories/search/", payload);
+		return { results: memories };
 	}
 
 	/**
