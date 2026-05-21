@@ -43,6 +43,30 @@ export {
 	type LsToolOptions,
 } from "./ls.ts";
 export {
+	createMemoryAddTool,
+	createMemoryAddToolDefinition,
+	type MemoryAddOperations,
+	type MemoryAddToolDetails,
+	type MemoryAddToolInput,
+	type MemoryAddToolOptions,
+} from "./memory-add.ts";
+export {
+	createMemoryGetAllTool,
+	createMemoryGetAllToolDefinition,
+	type MemoryGetAllOperations,
+	type MemoryGetAllToolDetails,
+	type MemoryGetAllToolInput,
+	type MemoryGetAllToolOptions,
+} from "./memory-get-all.ts";
+export {
+	createMemorySearchTool,
+	createMemorySearchToolDefinition,
+	type MemorySearchOperations,
+	type MemorySearchToolDetails,
+	type MemorySearchToolInput,
+	type MemorySearchToolOptions,
+} from "./memory-search.ts";
+export {
 	createReadTool,
 	createReadToolDefinition,
 	type ReadOperations,
@@ -75,13 +99,30 @@ import { createEditTool, createEditToolDefinition, type EditToolOptions } from "
 import { createFindTool, createFindToolDefinition, type FindToolOptions } from "./find.ts";
 import { createGrepTool, createGrepToolDefinition, type GrepToolOptions } from "./grep.ts";
 import { createLsTool, createLsToolDefinition, type LsToolOptions } from "./ls.ts";
+import {
+	createMemoryAddTool,
+	createMemoryAddToolDefinition,
+	type MemoryAddToolOptions,
+} from "./memory-add.ts";
+import {
+	createMemoryGetAllTool,
+	createMemoryGetAllToolDefinition,
+	type MemoryGetAllToolOptions,
+} from "./memory-get-all.ts";
+import {
+	createMemorySearchTool,
+	createMemorySearchToolDefinition,
+	type MemorySearchToolOptions,
+} from "./memory-search.ts";
 import { createReadTool, createReadToolDefinition, type ReadToolOptions } from "./read.ts";
 import { createWriteTool, createWriteToolDefinition, type WriteToolOptions } from "./write.ts";
 
 export type Tool = AgentTool<any>;
 export type ToolDef = ToolDefinition<any, any>;
 export type ToolName = "read" | "bash" | "edit" | "write" | "grep" | "find" | "ls";
+export type MemoryToolName = "memory_add" | "memory_search" | "memory_get_all";
 export const allToolNames: Set<ToolName> = new Set(["read", "bash", "edit", "write", "grep", "find", "ls"]);
+export const allMemoryToolNames: Set<MemoryToolName> = new Set(["memory_add", "memory_search", "memory_get_all"]);
 
 export interface ToolsOptions {
 	read?: ReadToolOptions;
@@ -91,6 +132,12 @@ export interface ToolsOptions {
 	grep?: GrepToolOptions;
 	find?: FindToolOptions;
 	ls?: LsToolOptions;
+}
+
+export interface MemoryToolsOptions {
+	memory_add?: MemoryAddToolOptions;
+	memory_search?: MemorySearchToolOptions;
+	memory_get_all?: MemoryGetAllToolOptions;
 }
 
 export function createToolDefinition(toolName: ToolName, cwd: string, options?: ToolsOptions): ToolDef {
@@ -193,4 +240,32 @@ export function createAllTools(cwd: string, options?: ToolsOptions): Record<Tool
 		find: createFindTool(cwd, options?.find),
 		ls: createLsTool(cwd, options?.ls),
 	};
+}
+
+export function createMemoryToolDefinitions(cwd: string, options: MemoryToolsOptions): ToolDef[] {
+	const defs: ToolDef[] = [];
+	if (options.memory_add) {
+		defs.push(createMemoryAddToolDefinition(cwd, options.memory_add));
+	}
+	if (options.memory_search) {
+		defs.push(createMemorySearchToolDefinition(cwd, options.memory_search));
+	}
+	if (options.memory_get_all) {
+		defs.push(createMemoryGetAllToolDefinition(cwd, options.memory_get_all));
+	}
+	return defs;
+}
+
+export function createMemoryTools(cwd: string, options: MemoryToolsOptions): Tool[] {
+	const tools: Tool[] = [];
+	if (options.memory_add) {
+		tools.push(createMemoryAddTool(cwd, options.memory_add));
+	}
+	if (options.memory_search) {
+		tools.push(createMemorySearchTool(cwd, options.memory_search));
+	}
+	if (options.memory_get_all) {
+		tools.push(createMemoryGetAllTool(cwd, options.memory_get_all));
+	}
+	return tools;
 }

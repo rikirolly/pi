@@ -4,6 +4,7 @@
 
 ### Added
 
+- Added Mem0 integration for persistent memory across sessions. Configure via `MEM0_API_KEY` environment variable to enable `memory_add`, `memory_search`, and `memory_get_all` tools.
 - Added a standard unified patch to edit tool result details for SDK consumers ([#4821](https://github.com/earendil-works/pi/issues/4821)).
 
 ### Changed

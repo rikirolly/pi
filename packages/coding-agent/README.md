@@ -635,6 +635,8 @@ pi --thinking high "Solve this complex problem"
 | `PI_TELEMETRY` | Override install/update telemetry. Use `1`/`true`/`yes` to enable or `0`/`false`/`no` to disable. This does not disable update checks |
 | `PI_CACHE_RETENTION` | Set to `long` for extended prompt cache (Anthropic: 1h, OpenAI: 24h) |
 | `VISUAL`, `EDITOR` | External editor for Ctrl+G |
+| `MEM0_API_KEY` | Mem0 API key for persistent memory integration |
+| `MEM0_BASE_URL` | Mem0 base URL for self-hosted instances (optional) |
 
 ---
 
@@ -653,3 +655,54 @@ MIT
 - [@earendil-works/pi-ai](https://www.npmjs.com/package/@earendil-works/pi-ai): Core LLM toolkit
 - [@earendil-works/pi-agent-core](https://www.npmjs.com/package/@earendil-works/pi-agent-core): Agent framework
 - [@earendil-works/pi-tui](https://www.npmjs.com/package/@earendil-works/pi-tui): Terminal UI components
+- [@earendil-works/pi-mem0](https://www.npmjs.com/package/@earendil-works/pi-mem0): Mem0 API client for persistent memory
+
+---
+
+## Persistent Memory with Mem0
+
+Pi can integrate with [Mem0](https://mem0.ai) for persistent memory across sessions. This allows the agent to remember information about users, projects, and preferences.
+
+### Setup
+
+1. Get an API key from [app.mem0.ai](https://app.mem0.ai)
+2. Set the environment variable:
+
+```bash
+export MEM0_API_KEY=your-api-key
+```
+
+For self-hosted Mem0 instances, also set:
+
+```bash
+export MEM0_BASE_URL=http://your-mem0-server:8080/v3
+```
+
+### Memory Tools
+
+When `MEM0_API_KEY` is configured, pi enables three memory tools:
+
+| Tool | Description |
+|------|-------------|
+| `memory_add` | Store information in persistent memory |
+| `memory_search` | Search memories with natural language queries |
+| `memory_get_all` | Retrieve all stored memories |
+
+### Usage Examples
+
+The agent can use these tools to:
+
+- Remember user preferences: "I prefer dark mode in all editors"
+- Store project context: "This project uses strict TypeScript with no `any` types"
+- Recall information: "What do you know about my coding preferences?"
+
+### Memory Scope
+
+Memories can be scoped to:
+
+- `user_id` - Per-user memory
+- `agent_id` - Per-agent memory
+- `run_id` - Per-session memory
+- `app_id` - Per-application memory
+
+By default, memories are not scoped and accessible across all contexts.
