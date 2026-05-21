@@ -352,3 +352,5 @@ export { parseFrontmatter, stripFrontmatter } from "./utils/frontmatter.ts";
 export { formatDimensionNote, type ResizedImage, resizeImage } from "./utils/image-resize.ts";
 // Shell utilities
 export { getShellConfig } from "./utils/shell.ts";
+// Built-in extensions
+export { createMem0Extension } from "./extensions/mem0.ts";

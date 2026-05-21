@@ -9,6 +9,7 @@ import { DefaultResourceLoader, type DefaultResourceLoaderOptions, type Resource
 import { type CreateAgentSessionOptions, type CreateAgentSessionResult, createAgentSession } from "./sdk.ts";
 import type { SessionManager } from "./session-manager.ts";
 import { SettingsManager } from "./settings-manager.ts";
+import { createMem0Extension } from "../extensions/mem0.ts";
 
 /**
  * Non-fatal issues collected while creating services or sessions.
@@ -134,8 +135,14 @@ export async function createAgentSessionServices(
 	const authStorage = options.authStorage ?? AuthStorage.create(join(agentDir, "auth.json"));
 	const settingsManager = options.settingsManager ?? SettingsManager.create(cwd, agentDir);
 	const modelRegistry = options.modelRegistry ?? ModelRegistry.create(authStorage, join(agentDir, "models.json"));
+	
+	// Built-in extensions (mem0 memory tools activate when MEM0_API_KEY is set)
+	const builtinExtensions = [createMem0Extension(cwd)];
+	const userExtensions = options.resourceLoaderOptions?.extensionFactories ?? [];
+	
 	const resourceLoader = new DefaultResourceLoader({
 		...(options.resourceLoaderOptions ?? {}),
+		extensionFactories: [...builtinExtensions, ...userExtensions],
 		cwd,
 		agentDir,
 		settingsManager,
